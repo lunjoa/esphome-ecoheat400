@@ -1,4 +1,4 @@
-# panna
+# ESPHome Ecoheat400 
 
 ESPHome device with modbus registers for Ecoheat 400.
 
