@@ -1,0 +1,297 @@
+esphome:
+  name: panna
+
+esp32:
+  board: az-delivery-devkit-v4
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret password
+
+ota:
+  password: !secret password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Panna Fallback Hotspot"
+    password: !secret wifi_password
+
+captive_portal:
+
+uart:
+  id: mod_bus
+  tx_pin: 17
+  rx_pin: 16
+  baud_rate: 9600
+  parity: EVEN
+  stop_bits: 1
+
+modbus:
+  flow_control_pin: 5
+  id: modbus1
+
+modbus_controller:
+  - id: epever
+    ## the Modbus device addr
+    address: 0x1
+    modbus_id: modbus1
+    setup_priority: -10
+
+sensor:
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "Utomhustemperatur"
+    id: outdoor
+    register_type: read
+    address: 0x025E
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: S_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "Tank Övre Temperatur"
+    id: upper_tank
+    register_type: read
+    address: 0x0259
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: S_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "Tank Nedre Temperatur"
+    id: lower_tank
+    register_type: read
+    address: 0x025B
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: S_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "Huvudflödestemperatur"
+    id: pri_flo
+    register_type: read
+    address: 0x025F
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: S_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "L1"
+    id: l1
+    register_type: read
+    address: 0x0264
+    unit_of_measurement: "A"
+    device_class: "current"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "L2"
+    id: l2
+    register_type: read
+    address: 0x0265
+    unit_of_measurement: "A"
+    device_class: "current"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "L3"
+    id: l3
+    register_type: read
+    address: 0x0266
+    unit_of_measurement: "A"
+    device_class: "current"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "Brine Intemperatur"
+    id: brine_in
+    register_type: read
+    address: 0x0277
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: S_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "Brine Uttemperatur"
+    id: brine_out
+    register_type: read
+    address: 0x0276
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: S_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "Retur Temperatur"
+    id: radiator_return
+    register_type: read
+    address: 0x0279
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: S_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "Framledning Temperatur"
+    id: radiator_out
+    register_type: read
+    address: 0x027A
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: S_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "Kondensator Temperatur In"
+    id: con_in
+    register_type: read
+    address: 0x025D
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: S_WORD
+    filters:
+      - multiply: 0.1
+
+binary_sensor:
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    id: brine_pump
+    name: "Brinepump"
+    register_type: read
+    address: 0x028A
+    bitmask: 0x30 #(bit 3)
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    id: radiator_pump
+    name: "Radiatorpump"
+    register_type: read
+    address: 0x026C
+    bitmask: 0x0 #(bit 0)
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    id: immersion_heater_low_l1
+    name: "Elpatron L1 Låg"
+    register_type: read
+    address: 0x026C
+    bitmask: 0x3F #(bit 7)
+  
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    id: immersion_heater_high_l1
+    name: "Elpatron L1 Hög"
+    register_type: read
+    address: 0x026C
+    bitmask: 0x7F #(bit 8)
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    id: immersion_heater_low_l2
+    name: "Elpatron L2 Låg"
+    register_type: read
+    address: 0x026C
+    bitmask: 0xFF #(bit 9)
+  
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    id: immersion_heater_high_l2
+    name: "Elpatron L2 Hög"
+    register_type: read
+    address: 0x026C
+    bitmask: 0x1FF #(bit 10)
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    id: immersion_heater_low_l3
+    name: "Elpatron L3 Låg"
+    register_type: read
+    address: 0x026C
+    bitmask: 0x3FF #(bit 11)
+  
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    id: immersion_heater_high_l3
+    name: "Elpatron L3 Hög"
+    register_type: read
+    address: 0x026C
+    bitmask: 0x7FF #(bit 12)
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    id: immersion_heater_3kw
+    name: "Elpatron 3kW"
+    register_type: read
+    address: 0x026C
+    bitmask: 0xFFF #(bit 13)
+  
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    id: immersion_heater_6kw
+    name: "Elpatron 6kW"
+    register_type: read
+    address: 0x026C
+    bitmask: 0x1FFF #(bit 14)
