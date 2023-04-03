@@ -1,5 +1,5 @@
 esphome:
-  name: panna
+  name: "ecoheat400"
 
 esp32:
   board: az-delivery-devkit-v4
